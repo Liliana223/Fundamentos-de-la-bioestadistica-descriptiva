@@ -1,0 +1,439 @@
+---
+title: "Modulo 2. Fundamentos de la bioestadistica descriptiva"
+author: "Astrid Liliana Vargas Sanchez"
+date: "2025-05-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Bioestadística descriptiva 
+
+Se encarga de resumir y describir los datos mediante medidas numéricas (como promedios, medianas y desviaciones estándar) y representaciones gráficas (como tablas, gráficos de barras o histogramas). Su objetivo es organizar y presentar la información de forma comprensible, sin realizar inferencias o predicciones.  Información acerca de la distribución, dispersión y forma de los datos.
+
+### Representaciones gráficas
+
+#### Histogramas
+
+Representa variables cuantitativas continuas. Distribución de frecuencia de un conjunto de datos numéricos continuos.
+
+```{r}
+# install.packages("ggplot2")  # Para gráficos
+library(ggplot2)
+
+# Usamos el dataset iris
+data(iris)
+```
+
+```{r}
+ggplot(iris, aes(x = Sepal.Length)) +
+  geom_histogram(binwidth = 0.5, fill = "skyblue", color = "black") +
+  labs(title = "Histograma de la Longitud del Sépalo", x = "Longitud (cm)", y = "Frecuencia")
+```
+
+#### Graficos de barras
+
+```{r}
+ggplot(iris, aes(x = Species, fill = Species)) +
+  geom_bar() +
+  labs(title = "Cantidad de muestras por especie", x = "Especie", y = "Frecuencia") +
+  theme_minimal()
+```
+
+####  Diagrama de pastel
+
+```{r}
+# Crear tabla de proporciones
+species_counts <- as.data.frame(table(iris$Species))
+colnames(species_counts) <- c("Especie", "Frecuencia")
+species_counts$Fraccion <- species_counts$Frecuencia / sum(species_counts$Frecuencia)
+species_counts$Etiqueta <- paste0(species_counts$Especie, " (", round(species_counts$Fraccion * 100), "%)")
+
+ggplot(species_counts, aes(x = "", y = Fraccion, fill = Especie)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar("y") +
+  labs(title = "Proporción de especies (Diagrama de pastel)") +
+  theme_void() +
+  geom_text(aes(label = Etiqueta), position = position_stack(vjust = 0.5))
+
+```
+
+####  Diagrama de dispersión
+
+```{r}
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) +
+  geom_point(size = 3) +
+  labs(title = "Diagrama de dispersión: Pétalo", x = "Longitud del pétalo", y = "Ancho del pétalo") +
+  theme_light()
+```
+
+####  Diagrama de caja y bigotes (Boxplot)
+
+```{r}
+ggplot(iris, aes(x = Species, y = Sepal.Length, fill = Species)) +
+  geom_boxplot() +
+  labs(title = "Boxplot: Longitud del sépalo por especie", x = "Especie", y = "Longitud del sépalo") +
+  theme_minimal()
+```
+
+### Medidas de tendencia central
+
+Valor que representa la posición central de una distribución de datos 
+
+#### Media
+
+Es una medida estadística utilizada para obtener el valor promedio de un conjunto de datos. Es la suma de todos los valores dividida entre la cantidad de datos. Es sensible a datos atipicos.
+
+```{r}
+# --------------------------------------------
+# Medidas de tendencia central en R
+# --------------------------------------------
+
+# 1. Crear un vector de datos numéricos
+datos <- c(10, 20, 30, 30, 40, 50, 50, 50, 60)
+
+# Ver los datos
+print("Datos:")
+print(datos)
+
+# --------------------------------------------
+# 2. Calcular la media (promedio)
+# --------------------------------------------
+media <- mean(datos)
+cat("Media:", media, "\n")
+```
+#### Mediana
+
+Representa el valor central en un conjunto de datos ordenados. Reduce el impacto de los valores atípicos. Si hay un número par de datos, es el promedio de los dos valores centrales.
+```{r}
+# --------------------------------------------
+# 3. Calcular la mediana (valor central)
+# --------------------------------------------
+mediana <- median(datos)
+cat("Mediana:", mediana, "\n")
+
+```
+#### Moda
+
+La moda es un valor estadístico que representa el valor más frecuente o con un mayor número de apariciones en un conjunto de datos
+```{r}
+
+# --------------------------------------------
+# 4. Calcular la moda (valor que más se repite)
+# --------------------------------------------
+
+# install.packages("DescTools")   # Solo la primera vez
+library(DescTools)
+
+moda <- Mode(datos)
+
+cat("Moda:", moda, "\n")
+```
+
+### Medidas de dispersión
+
+Son un conjunto de estadísticos que nos permiten conocer la variabilidad de los datos. nos indican qué tan dispersos o agrupados están los datos con respecto a la media o entre sí. Sirven para complementar a las medidas de tendencia central y entender mejor la distribución de los datos.
+
+#### Rango
+
+Es la diferencia entre el valor más grande (Valor máximo) y el más pequeño (Valor mínimo).
+```{r}
+# --------------------------------------------
+# Medidas de dispersión en R
+# --------------------------------------------
+
+# 1. Crear un vector de datos numéricos
+datos <- c(10, 20, 30, 30, 40, 50, 50, 50, 60)
+
+# Ver los datos
+print("Datos:")
+print(datos)
+
+# --------------------------------------------
+# 2. Rango (valor máximo - mínimo)
+# --------------------------------------------
+rango <- max(datos) - min(datos)
+cat("Rango:", rango, "\n")
+
+```
+
+#### Varianza
+
+Mide cuánto se alejan, en promedio, los datos con respecto a la media, elevando al cuadrado esas diferencias. Se mide en unidades al cuadrado, por ejemplo, si tus datos están en centímetros, la varianza estará en cm².
+
+```{r}
+# --------------------------------------------
+# 3. Varianza
+# --------------------------------------------
+varianza <- var(datos)
+cat("Varianza:", varianza, "\n")
+
+```
+
+#### Desviación estandar
+
+Es la raíz cuadrada de la varianza. Mide cuánto se desvían, en promedio, los datos con respecto a la media, pero en las mismas unidades del dato original.
+
+```{r}
+# --------------------------------------------
+# 4. Desviación estándar
+# --------------------------------------------
+desviacion <- sd(datos)
+cat("Desviacion estandar:", desviacion, "\n")
+
+```
+#### Coeficiente de variación
+
+Mide la dispersión en porcentaje respecto a la media. Se usa para comparar variabilidad entre distintos conjuntos de datos (aunque tengan unidades diferentes).
+
+```{r}
+# --------------------------------------------
+# 5. Coeficiente de variación (en porcentaje)
+# --------------------------------------------
+media <- mean(datos)
+coef_var <- (desviacion / media) * 100
+cat("Coeficiente de variacion (%):", coef_var, "\n")
+```
+
+### Medidas de forma y posición
+
+Las medidas de forma y posición son herramientas estadísticas que complementan las medidas de tendencia central y dispersión. Ayudan a entender la forma de la distribución de los datos y a ubicar valores específicos dentro de esa distribución.
+
+#### Medidas de forma
+
+##### Asimetría
+Grado de distribución de una distribución de datos.
+
+```{r}
+# install.packages("moments")  # Solo una vez
+
+library(moments)             # Cargarlo cada vez
+
+# --------------------------------------------
+# Medidas de forma en R
+# --------------------------------------------
+
+# Crear un vector de datos numéricos
+datos <- c(10, 20, 30, 30, 40, 50, 50, 50, 60, 80, 100)
+
+# Mostrar datos
+print("Datos:")
+print(datos)
+
+# --------------------------------------------
+# Asimetría (Skewness)
+# --------------------------------------------
+asimetria <- skewness(datos)
+cat("Coeficiente de asimetria:", asimetria, "\n")
+
+# --------------------------------------------
+# Interpretación básica
+# --------------------------------------------
+if (asimetria > 0) {
+  cat("La distribucion esta sesgada a la derecha (asimetria positiva).\n")
+} else if (asimetria < 0) {
+  cat("La distribucion esta sesgada a la izquierda (asimetria negativa).\n")
+} else {
+  cat("La distribucion es simetrica.\n")
+}
+
+```
+##### Curtosis
+Permite evaluar el grado de concentración de una distribución de datos en torno a su media. Determina si una distribución es más puntiaguda o aplanada. 
+
+```{r}
+# --------------------------------------------
+# Curtosis
+# --------------------------------------------
+curtosis <- kurtosis(datos)
+cat("Curtosis:", curtosis, "\n")
+
+if (curtosis > 3) {
+  cat("Distribucion leptocurtica (mas apuntada que la normal).\n")
+} else if (curtosis < 3) {
+  cat("Distribucion platicurtica (mas plana que la normal).\n")
+} else {
+  cat("Distribucion mesocurtica (similar a la normal).\n")
+}
+
+# Creación de grafica para visualizar los datos
+
+# install.packages("ggplot2")  # Para gráficos
+library(ggplot2)
+
+# --------------------------------------------
+# Crear un data frame para ggplot
+# --------------------------------------------
+df <- data.frame(valores = datos)
+
+# --------------------------------------------
+# Graficar histograma con curva de densidad
+# --------------------------------------------
+ggplot(df, aes(x = valores)) +
+  geom_histogram(aes(y = after_stat(density)), 
+                 bins = 10, 
+                 fill = "skyblue", 
+                 color = "black", 
+                 alpha = 0.7) +
+  geom_density(color = "red", linewidth = 1.2) +
+  geom_vline(aes(xintercept = mean(valores)),
+             color = "blue", linetype = "dashed", size = 1) +
+  labs(
+    title = "Distribución con histograma y curva de densidad",
+    subtitle = paste0("Asimetría = ", round(asimetria, 2), 
+                      " | Curtosis = ", round(curtosis, 2)),
+    x = "Valores",
+    y = "Densidad"
+  ) +
+  theme_minimal()
+
+# La distribucion esta sesgada a la derecha (asimetria positiva).
+# Distribucion platicurtica (mas plana que la normal).
+```
+#### Medidas de posición
+
+##### Cuartiles
+Dividen un conjunto de datos ordenado en cuatro partes iguales, cada una con el 25% de los datos.
+
+```{r}
+# 1. Crear un vector de datos numéricos
+datos <- c(0, 25, 50, 75, 100)
+
+# Ver los datos
+print("Datos:")
+print(datos)
+
+# --------------------------------------------
+# 2. Cuartiles (Q1, Q2, Q3)
+# --------------------------------------------
+cuartiles <- quantile(datos)
+print("Cuartiles:")
+print(cuartiles)
+
+```
+Q1 (primer cuartil): El 25% de los datos están por debajo de este valor.
+Q2 (segundo cuartil): Corresponde a la mediana (50% de los datos).
+Q3 (tercer cuartil): El 75% de los datos están por debajo de este valor.
+
+```{r}
+# Crear el boxplot
+boxplot(datos,
+        main = "Boxplot con cuartiles",
+        ylab = "Valores",
+        col = "lightblue",
+        border = "darkblue")
+
+# Agregar líneas horizontales para los cuartiles
+abline(h = cuartiles[2], col = "red", lty = 2)  # Mediana (Q2)
+abline(h = cuartiles[1], col = "green", lty = 2) # Q1
+abline(h = cuartiles[3], col = "orange", lty = 2) # Q3
+
+# Agregar texto para identificar cada línea
+text(x = 1.25, y = cuartiles[1], labels = "Q1. 25%", col = "green", pos = 3)
+text(x = 1.25, y = cuartiles[2], labels = "Q2 (Mediana). 50%", col = "red", pos = 3)
+text(x = 1.25, y = cuartiles[3], labels = "Q3. 75%", col = "orange", pos = 3)
+
+```
+
+```{r}
+# Crear el vector de datos
+edades <- c(10, 20, 30, 30, 40, 50, 50, 50, 60)
+
+# Calcular los cuartiles
+cuartiles <- quantile(edades)
+print("Cuartiles:")
+print(cuartiles)
+
+# Crear el boxplot
+boxplot(edades,
+        main = "Boxplot con cuartiles",
+        ylab = "Edades",
+        col = "lightblue",
+        border = "darkblue")
+
+# Agregar líneas horizontales para los cuartiles
+abline(h = cuartiles[2], col = "red", lty = 2)  # Mediana (Q2)
+abline(h = cuartiles[1], col = "green", lty = 2) # Q1
+abline(h = cuartiles[3], col = "orange", lty = 2) # Q3
+
+# Agregar texto para identificar cada línea
+text(x = 1.25, y = cuartiles[1], labels = "Q1", col = "green", pos = 3)
+text(x = 1.25, y = cuartiles[2], labels = "Q2 (Mediana)", col = "red", pos = 3)
+text(x = 1.25, y = cuartiles[3], labels = "Q3", col = "orange", pos = 3)
+
+```
+##### Percentiles
+Dividen los datos en cien partes iguales, y son de las medidas más detalladas.
+
+```{r}
+# --------------------------------------------
+# Crear un vector de datos
+# --------------------------------------------
+datos <- c(10, 20, 30, 30, 40, 50, 50, 50, 60, 80, 100)
+
+# --------------------------------------------
+# Calcular percentiles del 1 al 99
+# --------------------------------------------
+
+# Los percentiles deben ir del 0 al 1 (ej. 0.25 = 25%)
+percentiles <- quantile(datos, probs = seq(0.01, 0.99, by = 0.01))
+
+# OTRO EJEMPLO:
+# percentiles <- quantile(datos, probs = c(0.10, 0.25, 0.50, 0.75, 0.90))
+
+# Mostrar resultados
+print("Percentiles calculados:")
+print(percentiles)
+
+```
+El percentil 10 (P10) es el valor por debajo del cual está el 10% de los datos.
+El percentil 50 (P50) es la mediana.
+El percentil 75 (P75) es equivalente al cuartil 3.
+
+```{r}
+# Convertir en data frame para graficar
+df_percentiles <- data.frame(
+  percentil = as.numeric(gsub("%", "", names(percentiles))),
+  valor = as.numeric(percentiles)
+)
+
+# --------------------------------------------
+# Gráfico de líneas
+# --------------------------------------------
+library(ggplot2)
+
+ggplot(df_percentiles, aes(x = percentil, y = valor)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(color = "darkred", size = 1.5) +
+  labs(title = "Percentiles del vector de datos",
+       x = "Percentil (%)", y = "Valor") +
+  theme_minimal()
+```
+
+#### Reto de programación!!
+
+Cargue el Dataset de Palmer Penguins y calcule varias las medidas de tendencia central, medidas de dispersión y medidas de forma y posición
+
+```{r}
+# Leer los datos y establecer el directorio de trabajo
+setwd("C:\\Users\\USER\\Descargas\\Documentos\\Pinguinos")
+pinguinos <- read.csv("palmerpenguins_extended.csv")
+```
+
+```{r}
+# Calculo de la media de la columna bill_length_mm o Longitud del pico en milímetros
+mean(pinguinos$bill_length_mm, na.rm = TRUE) # na.rm = TRUE se usa para ignorar los valores faltantes (NA) en el cálculo.
+
+# Calcular la media por especie
+
+library(dplyr) # Se usa principalmente para manipular, transformar y resumir datos de manera clara y eficiente
+
+# install.packages("dplyr")  # Para gráficos
+
+pinguinos %>%
+  group_by(species) %>%
+  summarise(Media_longitud_pico = mean(bill_length_mm, na.rm = TRUE))
+```
+
